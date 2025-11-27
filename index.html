@@ -1,376 +1,812 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Architecture of Ethical Reasoning</title>
+    <title>Ethics Beyond Boundaries - Your Lens & Coherence Check</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- 
-    Chosen Palette: Professional Indigo & Slate
-    Application Structure Plan: A thematic SPA divided into five core sections that mirror the essay's logical flow but are presented for interactive exploration. 1) Introduction with a "Gaming Discovery" hook. 2) A section detailing the Personal Reality Framework (PRF). 3) A deep dive into the "Three Universal Coordination Principles." 4) An interactive "Ethical Logic Toolkit" where users can explore ATL, STIT, and Coalition Logic. 5) A capstone "Ethical Cartography" simulation where users apply the entire framework to the AI Ethics case study. This structure guides the user from the foundational discovery to practical application, making the framework a usable tool rather than just a theoretical text.
-    Visualization & Content Choices: Report Info: Gaming Discovery Data -> Goal: Show evidence -> Viz: Bar Chart -> Interaction: Hover to see data points. -> Justification: The bar chart makes the performance advantages of diverse teams immediately apparent and impactful. -> Library: Chart.js. Report Info: PRF Components -> Goal: Explain -> Viz: Clickable cards -> Interaction: Click reveals details of each component (B, R, O, A+, C) and the UEV. Report Info: ATCF Components -> Goal: Explain measurement -> Viz: Doughnut Chart -> Interaction: Hover for component descriptions -> Justification: A doughnut chart is a good way to show a whole composed of parts (the ATCF score). -> Library: Chart.js. Report Info: Logical Tools -> Goal: Explain -> Viz: Tabbed interface for ATL, STIT, Coalition Logic -> Interaction: User clicks tabs to switch between explanations of the logical tools. Report Info: AI Ethics Case Study -> Goal: Simulate -> Viz: Step-by-step interactive workflow -> Interaction: User clicks through the 6 steps of the Ethical Cartography process, seeing how each tool is applied to generate a robust solution. This makes the abstract process concrete and actionable.
-    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
-    -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9; /* slate-100 */
-            color: #334155; /* slate-700 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .section-title {
-            color: #4338ca; /* indigo-700 */
-        }
-        .interactive-card {
-            transition: all 0.3s ease-in-out;
-            border: 1px solid #cbd5e1; /* slate-300 */
-        }
-        .interactive-card:hover, .interactive-card.active {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            border-color: #4f46e5; /* indigo-600 */
-        }
-        .chart-container {
+        .atcf-meter {
+            height: 40px;
+            background: linear-gradient(to right, #dc2626 0%, #f59e0b 33%, #10b981 66%, #059669 100%);
+            border-radius: 20px;
             position: relative;
-            height: 300px;
-            width: 100%;
-            max-width: 600px;
-            margin: auto;
+            border: 3px solid #1f2937;
         }
-        .tab-btn.active {
-            background-color: #4f46e5;
-            color: white;
+        .atcf-indicator {
+            position: absolute;
+            width: 6px;
+            height: 50px;
+            background: white;
+            border: 3px solid #1f2937;
+            top: -5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            border-radius: 3px;
         }
-        .step-item.active .step-circle {
-            background-color: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
+        .shield-icon {
+            display: inline-block;
+            font-size: 1.5em;
+            animation: pulse 2s infinite;
         }
-         .step-item.active .step-title {
-            color: #4338ca;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-700">
+<body class="bg-gray-50">
+    <div id="root"></div>
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-indigo-700">Ethical Architecture</h1>
-            <div class="hidden md:flex space-x-6 text-sm">
-                <a href="#foundation" class="text-slate-600 hover:text-indigo-600 transition">Foundation</a>
-                <a href="#principles" class="text-slate-600 hover:text-indigo-600 transition">Principles</a>
-                <a href="#language" class="text-slate-600 hover:text-indigo-600 transition">Language</a>
-                <a href="#toolkit" class="text-slate-600 hover:text-indigo-600 transition">Toolkit</a>
-                <a href="#cartography" class="text-slate-600 hover:text-indigo-600 transition">Cartography</a>
-            </div>
-        </nav>
-    </header>
+    <script type="text/babel">
+        const { useState } = React;
 
-    <main class="container mx-auto px-6 py-12">
-
-        <section id="intro" class="text-center mb-24">
-            <h2 class="text-4xl md:text-5xl font-bold mb-4">The Architecture of Ethical Reasoning</h2>
-            <p class="max-w-3xl mx-auto text-lg text-slate-600">
-                This is a unified framework for applied ethics, moving from abstract theory to a practical science of coordination. It provides worldview-agnostic tools to navigate complex moral decisions and design effective ethical systems.
-            </p>
-        </section>
-
-        <section id="foundation" class="mb-24 pt-8">
-            <h3 class="text-3xl font-bold text-center mb-2 section-title">Part I: The Foundation</h3>
-            <p class="text-center max-w-2xl mx-auto mb-12 text-slate-600">
-                A key discovery from over 4,000 international gaming sessions grounds this framework: culturally diverse teams consistently outperform homogeneous ones when they focus on coordination capabilities rather than shared beliefs.
-            </p>
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                <h4 class="text-xl font-bold text-center mb-4">Performance Advantage of Diverse Teams</h4>
-                <div class="chart-container">
-                    <canvas id="performanceChart"></canvas>
-                </div>
-            </div>
-            <div class="mt-12">
-                 <h4 class="text-2xl font-bold text-center mb-6">Your Ethical Mind as Living Architecture: The PRF</h4>
-                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="col-span-3 md:col-span-1 space-y-4">
-                         <div id="prf-card-b" class="interactive-card bg-white p-4 rounded-lg cursor-pointer"><strong>B:</strong> Belief System</div>
-                         <div id="prf-card-r" class="interactive-card bg-white p-4 rounded-lg cursor-pointer"><strong>R:</strong> Rule System</div>
-                         <div id="prf-card-o" class="interactive-card bg-white p-4 rounded-lg cursor-pointer"><strong>O:</strong> Ontological System</div>
-                         <div id="prf-card-a" class="interactive-card bg-white p-4 rounded-lg cursor-pointer"><strong>A+:</strong> Authenticity System</div>
-                         <div id="prf-card-c" class="interactive-card bg-white p-4 rounded-lg cursor-pointer"><strong>C:</strong> Coordination Capabilities</div>
-                         <div id="prf-card-uev" class="interactive-card bg-white p-4 rounded-lg cursor-pointer"><strong>UEV:</strong> Unified Experience Vector</div>
-                    </div>
-                    <div id="prf-detail-view" class="md:col-span-2 bg-white p-6 rounded-xl shadow-lg">
-                        <h5 id="prf-detail-title" class="font-bold text-xl mb-2 text-indigo-700">Click a component to learn more</h5>
-                        <p id="prf-detail-text" class="text-slate-600">Your moral reasoning operates through an integrated, measurable system. This Personal Reality Framework (PRF) is the living architecture of your ethical mind.</p>
-                    </div>
-                 </div>
-            </div>
-        </section>
-
-        <section id="principles" class="mb-24 pt-8">
-            <h3 class="text-3xl font-bold text-center mb-2 section-title">The Three Universal Coordination Principles</h3>
-            <p class="text-center max-w-2xl mx-auto mb-12 text-slate-600">
-                Cross-cultural research reveals that all effective ethical coordination, regardless of the specific moral tradition, relies on three organizational principles.
-            </p>
-            <div class="grid md:grid-cols-3 gap-8">
-                 <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <div class="text-4xl mb-4">1</div>
-                    <h4 class="font-bold text-xl mb-2">Capability-Based Connection</h4>
-                    <p class="text-slate-600">Coordination emerges from recognizing others' ethical capabilities, not from demanding shared beliefs. A utilitarian and a deontologist can work together by respecting each other's analytical strengths.</p>
-                </div>
-                 <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <div class="text-4xl mb-4">2</div>
-                    <h4 class="font-bold text-xl mb-2">Temporal Coherence</h4>
-                    <p class="text-slate-600">Ethical decisions must integrate past wisdom, present reality, and future consequences. This ability to maintain coherence across time is a measurable predictor of ethical capability.</p>
-                </div>
-                 <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <div class="text-4xl mb-4">3</div>
-                    <h4 class="font-bold text-xl mb-2">Cross-Scale Organization</h4>
-                    <p class="text-slate-600">The same architectural principles that enable individual moral agency also enable effective family, institutional, and societal ethics. Ethical systems are fractal.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="language" class="mb-24 pt-8">
-            <h3 class="text-3xl font-bold text-center mb-2 section-title">Part II: The Language of Capability</h3>
-            <p class="text-center max-w-2xl mx-auto mb-12 text-slate-600">
-                This framework revolutionizes how we understand ethical statements. Instead of asking what a statement like "We should help the poor" *means* as a universal truth, we ask what *capabilities* an agent needs to work with it effectively.
-            </p>
-            <div class="bg-white rounded-xl shadow-lg p-8">
-                <h4 class="text-xl font-bold text-center">Capability Specification for: "We Should Help the Poor"</h4>
-                <p class="text-center text-sm text-slate-500 mb-8">Effective use of this statement requires four distinct capabilities:</p>
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-                    <div>
-                        <div class="mx-auto bg-indigo-100 text-indigo-700 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">R</div>
-                        <h5 class="font-semibold mt-4">Recognition</h5>
-                        <p class="text-sm text-slate-500">Ability to identify poverty's impacts.</p>
-                    </div>
-                    <div>
-                        <div class="mx-auto bg-indigo-100 text-indigo-700 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">R</div>
-                        <h5 class="font-semibold mt-4">Response</h5>
-                        <p class="text-sm text-slate-500">Procedural knowledge for anti-poverty actions.</p>
-                    </div>
-                    <div>
-                        <div class="mx-auto bg-indigo-100 text-indigo-700 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">C</div>
-                        <h5 class="font-semibold mt-4">Coordination</h5>
-                        <p class="text-sm text-slate-500">Skills to work with others on complementary actions.</p>
-                    </div>
-                    <div>
-                        <div class="mx-auto bg-indigo-100 text-indigo-700 w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold">A</div>
-                        <h5 class="font-semibold mt-4">Assessment</h5>
-                        <p class="text-sm text-slate-500">Meta-capacity to evaluate and improve strategies.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="toolkit" class="mb-24 pt-8">
-            <h3 class="text-3xl font-bold text-center mb-2 section-title">Part III: The Measurement Toolkit</h3>
-             <p class="text-center max-w-2xl mx-auto mb-12 text-slate-600">
-                This framework integrates formal logic as a practical toolkit for ethical reasoning. Explore the different tools and their applications below.
-            </p>
-            <div class="bg-white rounded-xl shadow-lg">
-                <div class="flex border-b border-slate-200">
-                    <button class="tab-btn flex-1 p-4 font-semibold text-slate-500 transition active" data-tab="atl">ATL</button>
-                    <button class="tab-btn flex-1 p-4 font-semibold text-slate-500 transition" data-tab="stit">STIT</button>
-                    <button class="tab-btn flex-1 p-4 font-semibold text-slate-500 transition" data-tab="coalition">Coalition Logic</button>
-                    <button class="tab-btn flex-1 p-4 font-semibold text-slate-500 transition" data-tab="atcf">ATCF</button>
-                </div>
-                <div class="p-8">
-                    <div id="tab-content-atl" class="tab-content">
-                        <h4 class="text-xl font-bold">Alternating-Time Temporal Logic (ATL)</h4>
-                        <p class="text-sm text-slate-500 mb-4">For Strategic Ethical Analysis</p>
-                        <p>ATL shifts the question from "Is this action right?" to "Do we have a strategy to ensure an ethical outcome?" It transforms abstract moral debate into practical analysis of capabilities and coordination.</p>
-                        <p class="mt-2 text-sm bg-slate-50 p-3 rounded-lg"><strong>Example:</strong> "Does our society have coalition strategies to guarantee universal healthcare access, regardless of political opposition or economic shifts?"</p>
-                    </div>
-                    <div id="tab-content-stit" class="tab-content hidden">
-                        <h4 class="text-xl font-bold">"Seeing To It That" Logic (STIT)</h4>
-                        <p class="text-sm text-slate-500 mb-4">For Personal Moral Agency</p>
-                        <p>STIT formalizes individual responsibility. It distinguishes between hoping for an outcome and having the actual capability to ethically ensure it happens. This prevents making commitments based on good intentions alone.</p>
-                         <p class="mt-2 text-sm bg-slate-50 p-3 rounded-lg"><strong>Example:</strong> It helps differentiate "I hope I'll be a good parent" (a wish) from "I have the skills and resources to ensure my child receives needed care" (a commitment based on capability).</p>
-                    </div>
-                    <div id="tab-content-coalition" class="tab-content hidden">
-                        <h4 class="text-xl font-bold">Coalition Logic</h4>
-                         <p class="text-sm text-slate-500 mb-4">For Distributed Ethical Responsibility</p>
-                        <p>This tool is for problems no single person can solve. It models how groups can coordinate their capabilities to achieve ethical outcomes that are beyond any individual's power.</p>
-                        <p class="mt-2 text-sm bg-slate-50 p-3 rounded-lg"><strong>Example:</strong> "What combination of roles (HR, leadership, staff) and capabilities is needed to eliminate hiring bias, and how must they coordinate to succeed?"</p>
-                    </div>
-                    <div id="tab-content-atcf" class="tab-content hidden grid md:grid-cols-2 gap-6 items-center">
-                        <div>
-                            <h4 class="text-xl font-bold">Adaptive Temporal Coherence Function (ATCF)</h4>
-                            <p class="text-sm text-slate-500 mb-4">For Mathematical Ethics Across Time</p>
-                            <p>The ATCF is a measurable assessment of an agent's ability to maintain a coherent ethical identity over time. High scores predict superior ethical decision-making. It has four key components.</p>
-                        </div>
-                        <div class="chart-container" style="height: 250px;">
-                             <canvas id="atcfChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="cartography" class="pt-8">
-            <h3 class="text-3xl font-bold text-center mb-2 section-title">Part IV: Applied Integration - Ethical Cartography</h3>
-            <p class="text-center max-w-2xl mx-auto mb-12 text-slate-600">
-                Ethical Cartography is the unified process in action. It's about mapping a moral territory and designing navigation routes, not just arguing about destinations. Let's apply it to the challenge of developing AI Ethics Guidelines.
-            </p>
-            <div class="bg-white rounded-xl shadow-lg p-8">
-                 <div class="flex flex-col md:flex-row gap-8">
-                    <div class="w-full md:w-1/3 space-y-2">
-                        <div id="step-1" class="step-item interactive-card p-3 rounded-lg cursor-pointer active">
-                            <h5 class="step-title font-semibold">1. Cross-Scale Analysis</h5>
-                        </div>
-                        <div id="step-2" class="step-item interactive-card p-3 rounded-lg cursor-pointer">
-                            <h5 class="step-title font-semibold">2. PRF Proposition Development</h5>
-                        </div>
-                        <div id="step-3" class="step-item interactive-card p-3 rounded-lg cursor-pointer">
-                             <h5 class="step-title font-semibold">3. Strategic Analysis (ATL)</h5>
-                        </div>
-                        <div id="step-4" class="step-item interactive-card p-3 rounded-lg cursor-pointer">
-                             <h5 class="step-title font-semibold">4. Agency Assessment (STIT)</h5>
-                        </div>
-                         <div id="step-5" class="step-item interactive-card p-3 rounded-lg cursor-pointer">
-                             <h5 class="step-title font-semibold">5. Temporal Check (ATCF)</h5>
-                        </div>
-                         <div id="step-6" class="step-item interactive-card p-3 rounded-lg cursor-pointer">
-                             <h5 class="step-title font-semibold">6. Game-Theoretic Validation</h5>
-                        </div>
-                    </div>
-                    <div class="w-full md:w-2/3 bg-slate-50 p-6 rounded-lg">
-                        <h4 id="step-detail-title" class="font-bold text-xl mb-2 text-indigo-700"></h4>
-                        <p id="step-detail-text" class="text-slate-600"></p>
-                    </div>
-                 </div>
-            </div>
-        </section>
-
-    </main>
-    <footer class="text-center py-8 text-sm text-slate-500">
-        <p>The Architecture of Ethical Reasoning: A Unified Framework. FAIM-QIRF.</p>
-        <a href="https://rmertzman-tech.github.io/capability-coordination-framework/index.html" class="hover:text-indigo-600 underline" target="_blank">Technical Repository</a>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Smooth scroll for nav links
-            document.querySelectorAll('header nav a').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
+        function App() {
+            const [step, setStep] = useState('intro');
+            const [studentName, setStudentName] = useState('');
+            const [atcf, setATCF] = useState({
+                historical: 5,
+                present: 5,
+                prospective: 5
+            });
+            const [prf, setPRF] = useState({
+                experiences: ['', '', '', ''],
+                values: [],
+                lensPattern: '',
+                blindSpots: [],
+                growthAreas: ''
             });
 
-            // Performance Chart
-            const perfCtx = document.getElementById('performanceChart').getContext('2d');
-            new Chart(perfCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Complex Dilemmas', 'Adaptation', 'Innovation', 'Stakeholder Satisfaction'],
-                    datasets: [{
-                        label: '% Superior Performance of Diverse Teams',
-                        data: [23, 40, 35, 52],
-                        backgroundColor: 'rgba(79, 70, 229, 0.6)',
-                        borderColor: 'rgba(79, 70, 229, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, max: 60, ticks: { callback: value => value + '%' } } },
-                    plugins: { legend: { display: false } }
+            const avgATCF = ((atcf.historical + atcf.present + atcf.prospective) / 3).toFixed(1);
+
+            return (
+                <div className="min-h-screen pb-12">
+                    <header className="gradient-bg text-white shadow-lg no-print">
+                        <div className="max-w-4xl mx-auto px-4 py-6">
+                            <h1 className="text-3xl font-bold mb-2">🛡️ Your Lens & Coherence Check</h1>
+                            <p className="text-lg opacity-90">Ethics Beyond Boundaries - Self-Defense Tool</p>
+                        </div>
+                    </header>
+
+                    <main className="max-w-4xl mx-auto px-4 py-8">
+                        {step === 'intro' && <IntroStep onNext={() => setStep('atcf')} setName={setStudentName} name={studentName} />}
+                        {step === 'atcf' && <ATCFStep atcf={atcf} setATCF={setATCF} onNext={() => setStep('prf')} onBack={() => setStep('intro')} />}
+                        {step === 'prf' && <PRFStep prf={prf} setPRF={setPRF} onNext={() => setStep('results')} onBack={() => setStep('atcf')} />}
+                        {step === 'results' && <ResultsStep name={studentName} atcf={atcf} prf={prf} avgATCF={avgATCF} onRestart={() => { setStep('intro'); setStudentName(''); setATCF({historical: 5, present: 5, prospective: 5}); setPRF({experiences: ['','','',''], values: [], lensPattern: '', blindSpots: [], growthAreas: ''}); }} />}
+                    </main>
+                </div>
+            );
+        }
+
+        function IntroStep({ onNext, setName, name }) {
+            return (
+                <div className="bg-white rounded-lg shadow-lg p-8 fade-in">
+                    <div className="text-center mb-6">
+                        <span className="shield-icon">🛡️</span>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Welcome to Your Self-Defense Tool</h2>
+                    
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-5 mb-6">
+                        <p className="text-gray-700 mb-3">
+                            <strong>This tool does two things:</strong>
+                        </p>
+                        <ol className="space-y-2 text-gray-700 list-decimal list-inside">
+                            <li><strong>Maps your lens (PRF)</strong> - Shows you what's invisible so you can protect yourself</li>
+                            <li><strong>Checks your coherence (ATCF)</strong> - Measures if you're okay right now (like blood pressure for your soul)</li>
+                        </ol>
+                    </div>
+
+                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-5 mb-6">
+                        <p className="font-semibold text-yellow-900 mb-2">⚡ Why This Matters</p>
+                        <p className="text-sm text-gray-700">
+                            Roger Boisjoly didn't know his organizational blind spots. He couldn't track when the system 
+                            was fragmenting him. <strong>You'll have both.</strong> This is your early warning system.
+                        </p>
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            First, what's your name?
+                        </label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Enter your name"
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-lg"
+                        />
+                    </div>
+
+                    <button
+                        onClick={onNext}
+                        disabled={!name.trim()}
+                        className={`w-full px-6 py-4 rounded-lg font-semibold transition-colors text-lg ${
+                            name.trim() 
+                                ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                    >
+                        Start Your Self-Defense Check →
+                    </button>
+                </div>
+            );
+        }
+
+        function ATCFStep({ atcf, setATCF, onNext, onBack }) {
+            const avgATCF = ((atcf.historical + atcf.present + atcf.prospective) / 3).toFixed(1);
+            const isComplete = atcf.historical > 0 && atcf.present > 0 && atcf.prospective > 0;
+
+            const getATCFColor = (score) => {
+                if (score >= 8) return 'text-green-600';
+                if (score >= 6.5) return 'text-yellow-600';
+                if (score >= 5) return 'text-orange-600';
+                return 'text-red-600';
+            };
+
+            const getATCFLabel = (score) => {
+                if (score >= 8) return 'Strong - You\'re Thriving';
+                if (score >= 6.5) return 'Moderate - Watch Carefully';
+                if (score >= 5) return 'Warning - Needs Attention';
+                return 'Crisis - Get Support Now';
+            };
+
+            const getDefensiveInsight = (score) => {
+                if (score >= 8) return 'Your coherence is strong. Your meta-constructor capacity is working well - you\'re adapting while staying integrated. Keep doing what you\'re doing.';
+                if (score >= 6.5) return 'You\'re holding together but there\'s stress. Your meta-constructor is working but being challenged. Pay attention to what\'s causing tension. This is your early warning system - don\'t ignore it.';
+                if (score >= 5) return 'Warning level. Something in your life is fragmenting you. Your meta-constructor is struggling to maintain coherence. Identify what\'s causing this and make changes. Below 7 for 3 months = intervention needed.';
+                return 'Crisis level. Your coherence is severely compromised. Your meta-constructor cannot maintain integration under current conditions. You need support NOW. Talk to counseling services, trusted mentor, or professional. This is not sustainable.';
+            };
+
+            return (
+                <div className="bg-white rounded-lg shadow-lg p-8 fade-in">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                        🛡️ ATCF Check: Your Coherence Score
+                    </h2>
+
+                    <div className="bg-purple-50 border-l-4 border-purple-500 p-5 mb-6">
+                        <p className="text-gray-700 mb-2">
+                            <strong>ATCF = Adaptive Temporal Coherence Function</strong>
+                        </p>
+                        <p className="text-sm text-gray-700">
+                            Think of this like blood pressure for your psychological wellbeing. It measures three things:
+                            Can you trace a coherent story (Past)? Do your life domains support each other (Present)? 
+                            Can you imagine authentic futures (Future)?
+                        </p>
+                    </div>
+
+                    {/* Historical Continuity */}
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-xl font-bold text-blue-900 mb-3">📖 Past: Historical Continuity</h3>
+                        <p className="text-gray-700 mb-4">Can you trace a coherent story from your past to present?</p>
+                        
+                        <div className="bg-white rounded-lg p-4 mb-4 space-y-2 text-sm">
+                            <p><strong>9-10:</strong> Clear story - I understand how I got here</p>
+                            <p><strong>6-8:</strong> Mostly coherent - few disconnections I can explain</p>
+                            <p><strong>3-5:</strong> Some breaks - changes I don't fully understand</p>
+                            <p><strong>1-2:</strong> Fragmented - can't explain how I became who I am</p>
+                        </div>
+
+                        <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={atcf.historical}
+                            onChange={(e) => setATCF({...atcf, historical: parseInt(e.target.value)})}
+                            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                            style={{background: `linear-gradient(to right, #dc2626 0%, #f59e0b 50%, #10b981 100%)`}}
+                        />
+                        <div className="flex justify-between text-sm text-gray-600 mt-2">
+                            <span>Crisis</span>
+                            <span className={`text-2xl font-bold ${getATCFColor(atcf.historical)}`}>
+                                {atcf.historical}
+                            </span>
+                            <span>Strong</span>
+                        </div>
+                    </div>
+
+                    {/* Present Integration */}
+                    <div className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-xl font-bold text-green-900 mb-3">⚖️ Present: Life Integration</h3>
+                        <p className="text-gray-700 mb-4">Do your life domains support or fight each other?</p>
+                        
+                        <div className="bg-white rounded-lg p-4 mb-4 space-y-2 text-sm">
+                            <p><strong>9-10:</strong> Work, relationships, health, learning all support each other</p>
+                            <p><strong>6-8:</strong> Most domains align - one or two tensions but manageable</p>
+                            <p><strong>3-5:</strong> Significant conflicts - pulled in different directions</p>
+                            <p><strong>1-2:</strong> Major warfare - domains destroying each other</p>
+                        </div>
+
+                        <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={atcf.present}
+                            onChange={(e) => setATCF({...atcf, present: parseInt(e.target.value)})}
+                            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <div className="flex justify-between text-sm text-gray-600 mt-2">
+                            <span>Crisis</span>
+                            <span className={`text-2xl font-bold ${getATCFColor(atcf.present)}`}>
+                                {atcf.present}
+                            </span>
+                            <span>Strong</span>
+                        </div>
+                    </div>
+
+                    {/* Prospective Coherence */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-xl font-bold text-purple-900 mb-3">🔮 Future: Prospective Coherence</h3>
+                        <p className="text-gray-700 mb-4">Can you imagine authentic futures from here?</p>
+                        
+                        <div className="bg-white rounded-lg p-4 mb-4 space-y-2 text-sm">
+                            <p><strong>9-10:</strong> Multiple good paths forward, all recognizably me</p>
+                            <p><strong>6-8:</strong> Clear path forward that feels authentic</p>
+                            <p><strong>3-5:</strong> Future foggy or requires abandoning parts of myself</p>
+                            <p><strong>1-2:</strong> Can't imagine future without betraying who I am</p>
+                        </div>
+
+                        <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={atcf.prospective}
+                            onChange={(e) => setATCF({...atcf, prospective: parseInt(e.target.value)})}
+                            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <div className="flex justify-between text-sm text-gray-600 mt-2">
+                            <span>Crisis</span>
+                            <span className={`text-2xl font-bold ${getATCFColor(atcf.prospective)}`}>
+                                {atcf.prospective}
+                            </span>
+                            <span>Strong</span>
+                        </div>
+                    </div>
+
+                    {/* Combined Score */}
+                    {isComplete && (
+                        <div className="bg-white border-4 border-gray-300 rounded-lg p-6 mb-6">
+                            <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">Your Combined ATCF Score</h3>
+                            
+                            <div className="text-center mb-4">
+                                <p className={`text-6xl font-bold mb-2 ${getATCFColor(avgATCF)}`}>
+                                    {avgATCF}
+                                </p>
+                                <p className={`text-xl font-semibold ${getATCFColor(avgATCF)}`}>
+                                    {getATCFLabel(avgATCF)}
+                                </p>
+                            </div>
+
+                            <div className="atcf-meter mb-4">
+                                <div 
+                                    className="atcf-indicator"
+                                    style={{ left: `calc(${(avgATCF / 10) * 100}% - 3px)` }}
+                                ></div>
+                            </div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-6">
+                                <span>1<br/>Crisis</span>
+                                <span>5<br/>Warning</span>
+                                <span>7<br/>Moderate</span>
+                                <span>10<br/>Strong</span>
+                            </div>
+
+                            <div className={`p-5 rounded-lg ${
+                                avgATCF >= 8 ? 'bg-green-50 border-l-4 border-green-500' :
+                                avgATCF >= 6.5 ? 'bg-yellow-50 border-l-4 border-yellow-500' :
+                                avgATCF >= 5 ? 'bg-orange-50 border-l-4 border-orange-500' :
+                                'bg-red-50 border-l-4 border-red-500'
+                            }`}>
+                                <p className="font-semibold mb-2">🛡️ What This Means for Your Self-Defense:</p>
+                                <p className="text-sm text-gray-700">
+                                    {getDefensiveInsight(avgATCF)}
+                                </p>
+                            </div>
+
+                            {avgATCF < 5 && (
+                                <div className="mt-4 bg-red-100 border-2 border-red-500 rounded-lg p-4">
+                                    <p className="font-bold text-red-900 mb-2">🚨 URGENT: Get Support Now</p>
+                                    <ul className="text-sm text-gray-800 space-y-1">
+                                        <li>• Campus Counseling: [Your college counseling center]</li>
+                                        <li>• Crisis Text Line: Text HOME to 741741</li>
+                                        <li>• National Suicide Prevention: 988</li>
+                                        <li>• Talk to: Trusted professor, advisor, mentor, family member</li>
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Navigation */}
+                    <div className="flex justify-between">
+                        <button
+                            onClick={onBack}
+                            className="px-6 py-3 bg-gray-300 hover:bg-gray-400 rounded-lg font-semibold transition-colors"
+                        >
+                            ← Back
+                        </button>
+                        <button
+                            onClick={onNext}
+                            disabled={!isComplete}
+                            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                                isComplete 
+                                    ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                        >
+                            Continue to Map Your Lens →
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function PRFStep({ prf, setPRF, onNext, onBack }) {
+            const values = [
+                'Justice/Fairness', 'Compassion/Care', 'Honesty/Integrity', 'Loyalty/Fidelity',
+                'Freedom/Autonomy', 'Excellence/Achievement', 'Wisdom/Understanding', 'Courage/Bravery',
+                'Community/Belonging', 'Family/Kinship', 'Security/Safety', 'Growth/Learning',
+                'Faith/Spirituality', 'Creativity/Expression', 'Service/Contribution'
+            ];
+
+            const toggleValue = (value) => {
+                if (prf.values.includes(value)) {
+                    setPRF({...prf, values: prf.values.filter(v => v !== value)});
+                } else if (prf.values.length < 5) {
+                    setPRF({...prf, values: [...prf.values, value]});
                 }
-            });
-
-            // PRF Details
-            const prfDetails = {
-                b: { title: 'Belief System (B)', text: "Your probability assessments and confidence levels about moral propositions, with measurable neural correlates in prefrontal regions." },
-                r: { title: 'Rule System (R)', text: "Your procedural knowledge for navigating ethical situations, with weighted decision procedures that activate based on context." },
-                o: { title: 'Ontological System (O)', text: "Your fundamental categories for understanding moral reality—concepts of personhood, responsibility, harm, and justice." },
-                a: { title: 'Authenticity System (A+)', text: "Your standards for evaluating alignment with your core identity, including your Identity Kernel (IK), the invariant structures of your ethical self." },
-                c: { title: 'Coordination Capabilities (C)', text: "Your empirically assessed skills for working with others on ethical challenges, including perspective-taking and conflict resolution." },
-                uev: { title: 'Unified Experience Vector (UEV)', text: "The simultaneous, measurable integration of your Global Feeling Tone, Emotional Motivation Vector, Rational Deliberation Vector, and Action Readiness Vector." }
             };
 
-            const prfDetailTitle = document.getElementById('prf-detail-title');
-            const prfDetailText = document.getElementById('prf-detail-text');
-            document.querySelectorAll('.interactive-card[id^="prf-card-"]').forEach(card => {
-                card.addEventListener('click', () => {
-                    document.querySelectorAll('.interactive-card[id^="prf-card-"]').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    const key = card.id.split('-')[2];
-                    prfDetailTitle.innerText = prfDetails[key].title;
-                    prfDetailText.innerText = prfDetails[key].text;
-                });
-            });
-
-            // Logic Toolkit Tabs
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tab = btn.dataset.tab;
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    tabContents.forEach(content => {
-                        if (content.id === `tab-content-${tab}`) {
-                            content.classList.remove('hidden');
-                        } else {
-                            content.classList.add('hidden');
-                        }
-                    });
-                });
-            });
-            
-            // ATCF Chart
-            const atcfCtx = document.getElementById('atcfChart').getContext('2d');
-            new Chart(atcfCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Historical Continuity (HC)', 'Present Integration (PI)', 'Prospective Coherence (PC)', 'Meta-Constructor Capacity (MCC)'],
-                    datasets: [{
-                        label: 'ATCF Components',
-                        data: [25, 25, 25, 25],
-                        backgroundColor: ['rgba(79, 70, 229, 0.7)', 'rgba(30, 64, 175, 0.7)', 'rgba(129, 140, 248, 0.7)', 'rgba(199, 210, 254, 0.7)'],
-                        borderColor: '#f1f5f9',
-                        borderWidth: 2
-                    }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
-
-            // Cartography Steps
-            const stepDetails = {
-                '1': { title: '1. Cross-Scale Analysis', text: 'Map the coordination requirements across all levels, from individual developers to international bodies. Identify how actions at one scale impact others.' },
-                '2': { title: '2. PRF Proposition Development', text: 'Instead of abstract principles like "AI should be fair," define the specific capabilities development teams must have in their Belief, Rule, and other PRF systems to detect and mitigate bias.' },
-                '3': { title: '3. Strategic Analysis (ATL)', text: 'Use Alternating-Time Temporal Logic to ask: "Does humanity have coalition strategies to ensure ethical AI development, even with conflicting interests and external pressures?" This moves from hope to strategy.' },
-                '4': { title: '4. Agency Assessment (STIT)', text: 'Use STIT logic to identify which specific agents (e.g., a lead engineer, a safety board) have the actual power to "see to it that" an ethical constraint is implemented, clarifying responsibility.' },
-                '5': { title: '5. Temporal Coherence Check (ATCF)', text: 'Assess whether the proposed guidelines will enhance or fragment the long-term ethical coherence of the stakeholders. Will these rules support authentic development or force inauthentic compliance?' },
-                '6': { title: '6. Game-Theoretic Validation', text: 'Test the proposed guidelines in a simulated "game" against serious challenges (e.g., market competition, national security concerns) to ensure they form a "winning strategy" for ethical AI.' }
+            const updateExperience = (index, value) => {
+                const newExp = [...prf.experiences];
+                newExp[index] = value;
+                setPRF({...prf, experiences: newExp});
             };
 
-            const stepItems = document.querySelectorAll('.step-item');
-            const stepDetailTitle = document.getElementById('step-detail-title');
-            const stepDetailText = document.getElementById('step-detail-text');
+            const filledExperiences = prf.experiences.filter(e => e.trim()).length;
+            const isComplete = filledExperiences >= 3 && prf.values.length >= 3 && prf.growthAreas.trim();
 
-            function updateStepView(step) {
-                 stepItems.forEach(item => item.classList.remove('active'));
-                 document.getElementById(`step-${step}`).classList.add('active');
-                 stepDetailTitle.innerText = stepDetails[step].title;
-                 stepDetailText.innerText = stepDetails[step].text;
-            }
+            return (
+                <div className="bg-white rounded-lg shadow-lg p-8 fade-in">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                        🔍 Map Your Lens (PRF)
+                    </h2>
 
-            stepItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const step = item.id.split('-')[1];
-                    updateStepView(step);
-                });
-            });
-            updateStepView('1');
-        });
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-5 mb-6">
+                        <p className="text-gray-700">
+                            Your <strong>PRF (Phenomenological Reference Framework)</strong> is your interpretive lens. 
+                            It determines what you see first, what triggers emotions, and what seems obvious. 
+                            <strong> Knowing your lens is the first move in self-defense.</strong>
+                        </p>
+                    </div>
+
+                    {/* Formative Experiences */}
+                    <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-xl font-bold text-purple-900 mb-3">
+                            📖 Formative Experiences (Add at least 3)
+                        </h3>
+                        <p className="text-sm text-gray-700 mb-4">
+                            What experiences shaped your lens? Be specific.
+                        </p>
+
+                        <div className="space-y-3">
+                            {prf.experiences.map((exp, i) => (
+                                <div key={i}>
+                                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                        Experience {i + 1}:
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={exp}
+                                        onChange={(e) => updateExperience(i, e.target.value)}
+                                        placeholder={
+                                            i === 0 ? "e.g., Parents' divorce taught me about financial vulnerability" :
+                                            i === 1 ? "e.g., Being bullied made me sensitive to power dynamics" :
+                                            i === 2 ? "e.g., Volunteer work revealed privilege I'd been blind to" :
+                                            "Add another experience..."
+                                        }
+                                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">
+                            Filled: {filledExperiences}/4 (minimum 3 required)
+                        </p>
+                    </div>
+
+                    {/* Core Values */}
+                    <div className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-xl font-bold text-green-900 mb-3">
+                            ⭐ Core Values (Select 3-5)
+                        </h3>
+                        <p className="text-sm text-gray-700 mb-4">
+                            What values actually drive you? Pick your top 3-5.
+                        </p>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {values.map(value => (
+                                <button
+                                    key={value}
+                                    onClick={() => toggleValue(value)}
+                                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                                        prf.values.includes(value)
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-white border-2 border-gray-300 hover:border-green-500'
+                                    }`}
+                                    disabled={!prf.values.includes(value) && prf.values.length >= 5}
+                                >
+                                    {value}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">
+                            Selected: {prf.values.length}/5
+                        </p>
+                    </div>
+
+                    {/* Growth Areas */}
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-xl font-bold text-yellow-900 mb-3">
+                            🌱 Growth Areas
+                        </h3>
+                        <p className="text-sm text-gray-700 mb-4">
+                            What perspectives do you want to understand better? Where do you want to expand your lens?
+                        </p>
+                        <textarea
+                            value={prf.growthAreas}
+                            onChange={(e) => setPRF({...prf, growthAreas: e.target.value})}
+                            placeholder="e.g., I want to understand justice-focused thinking better, develop more practical problem-solving skills, learn to set boundaries..."
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-yellow-500 focus:outline-none"
+                            rows="4"
+                        />
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex justify-between">
+                        <button
+                            onClick={onBack}
+                            className="px-6 py-3 bg-gray-300 hover:bg-gray-400 rounded-lg font-semibold transition-colors"
+                        >
+                            ← Back
+                        </button>
+                        <button
+                            onClick={onNext}
+                            disabled={!isComplete}
+                            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                                isComplete 
+                                    ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                        >
+                            {isComplete ? 'See Your Results →' : `Complete All Sections (${isComplete ? '✓' : '...'} )`}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function ResultsStep({ name, atcf, prf, avgATCF, onRestart }) {
+            const getATCFColor = (score) => {
+                if (score >= 8) return 'text-green-600';
+                if (score >= 6.5) return 'text-yellow-600';
+                if (score >= 5) return 'text-orange-600';
+                return 'text-red-600';
+            };
+
+            const getLensPattern = () => {
+                const vals = prf.values.map(v => v.toLowerCase());
+                if (vals.some(v => v.includes('justice') || v.includes('fair'))) return 'Justice-Focused';
+                if (vals.some(v => v.includes('care') || v.includes('compassion'))) return 'Care-Focused';
+                if (vals.some(v => v.includes('excellence') || v.includes('wisdom'))) return 'Virtue-Focused';
+                if (vals.some(v => v.includes('freedom') || v.includes('autonomy'))) return 'Freedom-Focused';
+                return 'Balanced/Mixed';
+            };
+
+            const getLensStrengths = () => {
+                const pattern = getLensPattern();
+                const strengths = {
+                    'Justice-Focused': ['See fairness violations others miss', 'Strong sense of right and wrong', 'Advocate for equity'],
+                    'Care-Focused': ['Deep empathy for others', 'See human complexity', 'Build strong relationships'],
+                    'Virtue-Focused': ['Focus on character development', 'High personal standards', 'Long-term thinking'],
+                    'Freedom-Focused': ['Value autonomy and independence', 'Respect individual choice', 'Creative problem-solving'],
+                    'Balanced/Mixed': ['See multiple perspectives', 'Flexible in approach', 'Integrate different values']
+                };
+                return strengths[pattern] || strengths['Balanced/Mixed'];
+            };
+
+            const getLensBlindSpots = () => {
+                const pattern = getLensPattern();
+                const blindSpots = {
+                    'Justice-Focused': ['May prioritize fairness over compassion', 'Can be rigid about rules', 'Might miss personal context'],
+                    'Care-Focused': ['May be taken advantage of', 'Can avoid necessary conflict', 'Might miss systemic injustice'],
+                    'Virtue-Focused': ['Can be judgmental', 'May prioritize ideals over practicality', 'Might struggle with compromise'],
+                    'Freedom-Focused': ['May undervalue community obligations', 'Can be too individualistic', 'Might resist necessary structure'],
+                    'Balanced/Mixed': ['May struggle to commit to one approach', 'Can be indecisive', 'Might lack strong conviction']
+                };
+                return blindSpots[pattern] || blindSpots['Balanced/Mixed'];
+            };
+
+            const getProtectiveInsights = () => {
+                if (avgATCF >= 8) {
+                    return [
+                        'Your coherence is strong. Keep monitoring weekly to maintain this.',
+                        'Your meta-constructor capacity is working well - you\'re adapting without fragmenting.',
+                        'Use your lens strengths consciously. Be aware of blind spots when making decisions.',
+                        'Your growth areas show self-awareness. Continue expanding your perspective.'
+                    ];
+                } else if (avgATCF >= 6.5) {
+                    return [
+                        'You\'re holding together but experiencing stress. Something is challenging your coherence.',
+                        'Your meta-constructor is working but being tested. Pay attention to what\'s causing tension.',
+                        'Your lens blind spots may be contributing to stress. Be especially careful in those areas.',
+                        'Track your ATCF weekly. If it drops below 6.5 for a month, make changes.'
+                    ];
+                } else if (avgATCF >= 5) {
+                    return [
+                        'WARNING: Your coherence is compromised. Something in your life is fragmenting you.',
+                        'Your meta-constructor is struggling to maintain integration. Identify what\'s causing this NOW.',
+                        'Your lens blind spots are making you vulnerable. Get help seeing what you\'re missing.',
+                        'Action needed: Below 7 for 3 months = intervention required. Don\'t wait.'
+                    ];
+                } else {
+                    return [
+                        'CRISIS: Your coherence is severely compromised. Get support immediately.',
+                        'Your meta-constructor cannot maintain integration under current conditions.',
+                        'You need outside perspective NOW. Talk to counseling, trusted mentor, or professional.',
+                        'This is not sustainable. Make changes or exit current situation. Protect yourself.'
+                    ];
+                }
+            };
+
+            const downloadReport = () => {
+                const report = `
+ETHICS BEYOND BOUNDARIES - SELF-DEFENSE REPORT
+==============================================
+Student: ${name}
+Date: ${new Date().toLocaleDateString()}
+
+🛡️ YOUR ATCF SCORE (Coherence Check)
+====================================
+Past (Historical Continuity): ${atcf.historical}/10
+Present (Life Integration): ${atcf.present}/10
+Future (Prospective Coherence): ${atcf.prospective}/10
+
+COMBINED ATCF: ${avgATCF}/10
+STATUS: ${avgATCF >= 8 ? 'Strong - Thriving' : avgATCF >= 6.5 ? 'Moderate - Watch Carefully' : avgATCF >= 5 ? 'Warning - Needs Attention' : 'Crisis - Get Support Now'}
+
+🔍 YOUR LENS (PRF) PROFILE
+==========================
+PRIMARY PATTERN: ${getLensPattern()}
+
+TOP VALUES:
+${prf.values.map((v, i) => `${i + 1}. ${v}`).join('\n')}
+
+FORMATIVE EXPERIENCES:
+${prf.experiences.filter(e => e.trim()).map((e, i) => `${i + 1}. ${e}`).join('\n')}
+
+LENS STRENGTHS:
+${getLensStrengths().map(s => `✓ ${s}`).join('\n')}
+
+LENS BLIND SPOTS (What you might miss):
+${getLensBlindSpots().map(b => `⚠ ${b}`).join('\n')}
+
+GROWTH AREAS:
+${prf.growthAreas}
+
+🛡️ PROTECTIVE INSIGHTS
+======================
+${getProtectiveInsights().map((insight, i) => `${i + 1}. ${insight}`).join('\n\n')}
+
+📋 ACTION ITEMS
+==============
+1. Track your ATCF weekly using this tool
+2. Be especially careful when your lens blind spots apply
+3. Use SAGE framework (next class) when making important decisions
+4. If ATCF stays below 7 for 3 months, make changes or get help
+5. Practice seeing through other lenses (we'll learn 4 major ones)
+
+🚨 IF IN CRISIS (ATCF below 5)
+==============================
+- Campus Counseling: [Your college counseling center]
+- Crisis Text Line: Text HOME to 741741
+- National Suicide Prevention: 988
+- Talk to: Trusted professor, advisor, mentor, family member
+
+Remember: You're building a protection system. This is just Move #1.
+By Class 24, you'll have the complete self-defense toolkit.
+
+═══════════════════════════════════════════════════════════
+Save this report. Reference it throughout the semester.
+Update it monthly to track your coherence over time.
+═══════════════════════════════════════════════════════════
+                `.trim();
+
+                const blob = new Blob([report], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${name.replace(/\s+/g, '_')}_Self_Defense_Report.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const printReport = () => {
+                window.print();
+            };
+
+            return (
+                <div className="bg-white rounded-lg shadow-lg p-8 fade-in">
+                    <div className="text-center mb-6 no-print">
+                        <span className="text-6xl">🛡️</span>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                        {name}'s Self-Defense Report
+                    </h2>
+
+                    {/* ATCF Summary */}
+                    <div className="bg-gradient-to-br from-purple-100 to-blue-100 border-4 border-purple-400 rounded-lg p-6 mb-6">
+                        <h3 className="text-2xl font-bold text-purple-900 mb-4 text-center">
+                            Your Coherence Score (ATCF)
+                        </h3>
+                        <div className="text-center mb-4">
+                            <p className={`text-7xl font-bold mb-2 ${getATCFColor(avgATCF)}`}>
+                                {avgATCF}
+                            </p>
+                            <p className="text-xl text-gray-700 mb-2">
+                                Past: {atcf.historical} | Present: {atcf.present} | Future: {atcf.prospective}
+                            </p>
+                        </div>
+                        <div className="atcf-meter mb-4">
+                            <div 
+                                className="atcf-indicator"
+                                style={{ left: `calc(${(avgATCF / 10) * 100}% - 3px)` }}
+                            ></div>
+                        </div>
+                    </div>
+
+                    {/* PRF Summary */}
+                    <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-2xl font-bold text-blue-900 mb-4">Your Lens (PRF) Profile</h3>
+                        
+                        <div className="mb-4">
+                            <p className="font-semibold text-gray-700 mb-2">PRIMARY PATTERN:</p>
+                            <p className="text-xl font-bold text-blue-600">{getLensPattern()}</p>
+                        </div>
+
+                        <div className="mb-4">
+                            <p className="font-semibold text-gray-700 mb-2">TOP VALUES:</p>
+                            <div className="flex flex-wrap gap-2">
+                                {prf.values.map(v => (
+                                    <span key={v} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                                        {v}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4 mb-4">
+                            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                                <p className="font-semibold text-green-900 mb-2">✓ Lens Strengths:</p>
+                                <ul className="text-sm text-gray-700 space-y-1">
+                                    {getLensStrengths().map((s, i) => (
+                                        <li key={i}>• {s}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                                <p className="font-semibold text-yellow-900 mb-2">⚠ Lens Blind Spots:</p>
+                                <ul className="text-sm text-gray-700 space-y-1">
+                                    {getLensBlindSpots().map((b, i) => (
+                                        <li key={i}>• {b}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <p className="font-semibold text-gray-700 mb-2">FORMATIVE EXPERIENCES:</p>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                                {prf.experiences.filter(e => e.trim()).map((e, i) => (
+                                    <li key={i}>• {e}</li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <p className="font-semibold text-gray-700 mb-2">GROWTH AREAS:</p>
+                            <p className="text-sm text-gray-700">{prf.growthAreas}</p>
+                        </div>
+                    </div>
+
+                    {/* Protective Insights */}
+                    <div className={`border-4 rounded-lg p-6 mb-6 ${
+                        avgATCF >= 8 ? 'bg-green-50 border-green-400' :
+                        avgATCF >= 6.5 ? 'bg-yellow-50 border-yellow-400' :
+                        avgATCF >= 5 ? 'bg-orange-50 border-orange-400' :
+                        'bg-red-50 border-red-400'
+                    }`}>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">🛡️ Your Protective Insights</h3>
+                        <ol className="space-y-3 text-gray-800">
+                            {getProtectiveInsights().map((insight, i) => (
+                                <li key={i} className="flex">
+                                    <span className="font-bold mr-2">{i + 1}.</span>
+                                    <span>{insight}</span>
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+
+                    {/* Action Items */}
+                    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+                        <h3 className="text-2xl font-bold text-blue-900 mb-4">📋 Your Action Items</h3>
+                        <ol className="space-y-2 text-gray-700">
+                            <li>1. <strong>Track your ATCF weekly</strong> - Use this tool every Sunday</li>
+                            <li>2. <strong>Watch your blind spots</strong> - Be extra careful when they apply</li>
+                            <li>3. <strong>Learn SAGE next class</strong> - Systematic method for decisions</li>
+                            <li>4. <strong>Intervene if needed</strong> - ATCF below 7 for 3 months = make changes</li>
+                            <li>5. <strong>Expand your lens</strong> - Learn to see through other perspectives</li>
+                        </ol>
+                    </div>
+
+                    {avgATCF < 5 && (
+                        <div className="bg-red-100 border-4 border-red-500 rounded-lg p-6 mb-6">
+                            <h3 className="text-2xl font-bold text-red-900 mb-4">🚨 GET SUPPORT NOW</h3>
+                            <ul className="text-gray-800 space-y-2">
+                                <li>• <strong>Campus Counseling:</strong> [Your college counseling center]</li>
+                                <li>• <strong>Crisis Text Line:</strong> Text HOME to 741741</li>
+                                <li>• <strong>National Suicide Prevention:</strong> 988</li>
+                                <li>• <strong>Talk to:</strong> Trusted professor, advisor, mentor, family member</li>
+                            </ul>
+                        </div>
+                    )}
+
+                    {/* Buttons */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-6 no-print">
+                        <button
+                            onClick={downloadReport}
+                            className="px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors text-lg"
+                        >
+                            📥 Download Full Report
+                        </button>
+                        <button
+                            onClick={printReport}
+                            className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-lg"
+                        >
+                            🖨️ Print This Report
+                        </button>
+                    </div>
+
+                    <div className="text-center no-print">
+                        <p className="text-sm text-gray-600 mb-4">
+                            Save this report. Reference it throughout the semester. Update it monthly.
+                        </p>
+                        <button
+                            onClick={onRestart}
+                            className="px-6 py-3 bg-gray-300 hover:bg-gray-400 rounded-lg font-semibold transition-colors"
+                        >
+                            Start Over
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
-
